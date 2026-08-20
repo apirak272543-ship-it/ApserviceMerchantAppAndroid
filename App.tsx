@@ -8,7 +8,7 @@ import { DEFAULT_NOTIFICATION_PREFERENCES, loadNotificationPreferences, Notifica
 import { notificationToneLabel, notifyNewOrder, notifyStoreActionConfirmed, playStoreNotificationPreview, setupStoreNotifications } from "./src/notifications";
 import { applyOtaUpdate, downloadOtaUpdate, OtaResult } from "./src/ota";
 
-const CONSOLE_URL = "https://apirak272543-ship-it.github.io/ap-store-mobile/merchant/";
+const CONSOLE_URL = "https://apirak272543-ship-it.github.io/ap-store-mobile/merchant/?v=recognition-ui-v1";
 const SESSION_STORAGE_KEY = "apcx_store_supabase_session";
 const TONES: NotificationTone[] = ["ap_chime", "ap_urgent", "ap_priority"];
 
@@ -252,7 +252,7 @@ export default function App() {
   return <SafeAreaView style={styles.page}>
     <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
     <View style={styles.nativeHeader}>
-      <View><Text style={styles.brand}>AP Store</Text><Text style={styles.caption}>Store Console · ข้อมูลจริงจาก AP Service</Text></View>
+      <View><Text style={styles.brand}>AP Store</Text><Text style={styles.caption}>Store Console · Recognition และข้อมูลจริงจาก AP Service</Text></View>
       <View style={styles.headerActions}>
         <Pressable accessibilityLabel="รีเฟรชข้อมูลร้านค้า" style={styles.iconButton} onPress={refreshConsole}><Text style={styles.iconText}>↻</Text></Pressable>
         <Pressable accessibilityLabel="เมนูเพิ่มเติม" style={styles.iconButton} onPress={() => setSecondaryMenuOpen(true)}><Text style={styles.moreIcon}>•••</Text></Pressable>
