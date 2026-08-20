@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, AppState, BackHandler, Modal, Pressable, SafeAreaView, StatusBar, StyleSheet, Switch, Text, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ActivityIndicator, Alert, AppState, BackHandler, Linking, Modal, Pressable, SafeAreaView, StatusBar, StyleSheet, Switch, Text, View } from "react-native";
 import * as Location from "expo-location";
-import { WebView } from "react-native-webview";
+import { WebView, type WebViewNavigation } from "react-native-webview";
 
 import { clearSession, countOpenStoreOrders, disablePushToken, registerPushToken, Session } from "./src/api";
 import { DEFAULT_NOTIFICATION_PREFERENCES, loadNotificationPreferences, NotificationPreferences, NotificationTone, saveNotificationPreferences } from "./src/notification-settings";
@@ -11,6 +11,16 @@ import { applyOtaUpdate, downloadOtaUpdate, OtaResult } from "./src/ota";
 const CONSOLE_URL = "https://apirak272543-ship-it.github.io/ap-store-mobile/merchant/?v=recognition-ui-v1";
 const SESSION_STORAGE_KEY = "apcx_store_supabase_session";
 const TONES: NotificationTone[] = ["ap_chime", "ap_urgent", "ap_priority"];
+const ALLOWED_HOSTS = new Set(["apirak272543-ship-it.github.io", "abtsctwfkgzciseppach.supabase.co"]);
+
+function isPermittedInAppNavigation(url: string) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" && ALLOWED_HOSTS.has(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
 
 const sessionBridge = `
   (function () {
@@ -193,6 +203,12 @@ export default function App() {
     webRef.current?.reload();
   };
 
+  const handleNavigation = useCallback((request: WebViewNavigation) => {
+    if (isPermittedInAppNavigation(request.url)) return true;
+    void Linking.openURL(request.url).catch(() => undefined);
+    return false;
+  }, []);
+
   const openNotificationSettings = () => {
     setSecondaryMenuOpen(false);
     setSettingsOpen(true);
@@ -262,7 +278,8 @@ export default function App() {
       <WebView
         ref={webRef}
         source={{ uri: CONSOLE_URL }}
-        originWhitelist={["https://*", "http://*"]}
+        originWhitelist={["https://*"]}
+        onShouldStartLoadWithRequest={handleNavigation}
         injectedJavaScriptBeforeContentLoaded={sessionBridge}
         injectedJavaScript={sessionBridge}
         onMessage={handleMessage}

@@ -10,6 +10,14 @@ test("Merchant shell opens only the Merchant web destination", () => {
   assert.doesNotMatch(appSource, /ap-rider-mobile\/rider|Apservicebeta\/admin|ap-retail-pos/);
 });
 
+test("Merchant shell limits WebView navigation to AP Service hosts", () => {
+  assert.match(appSource, /const ALLOWED_HOSTS = new Set\(\["apirak272543-ship-it\.github\.io", "abtsctwfkgzciseppach\.supabase\.co"\]\)/);
+  assert.match(appSource, /parsed\.protocol === "https:" && ALLOWED_HOSTS\.has\(parsed\.hostname\)/);
+  assert.match(appSource, /onShouldStartLoadWithRequest=\{handleNavigation\}/);
+  assert.match(appSource, /Linking\.openURL\(request\.url\)/);
+  assert.ok(!appSource.includes('originWhitelist={["https://*", "http://*"]}'));
+});
+
 test("Merchant shell retains foreground location support", () => {
   assert.match(appSource, /geolocationEnabled/);
   assert.match(appConfig, /ACCESS_FINE_LOCATION/);
